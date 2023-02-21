@@ -6,6 +6,8 @@ class LikeController < ApplicationController
 
   def post_likes
     response = JSON.parse(request.body.read)[0]
+    return unless post_exist?
+
     post = Post.find(response['post_id'])
     likes = post.likes
     render json: likes.map { |like| { id: like.id, user_id: like.user_id, created_at: like.created_at } }
@@ -13,6 +15,8 @@ class LikeController < ApplicationController
 
   def create_like
     response = JSON.parse(request.body.read)[0]
+    return unless post_exist?
+
     post = Post.find(response['post_id'])
     if current_user.likes.where(post_id: post.id).count >= 1
       render json: { error: 'already liked' }
@@ -24,12 +28,25 @@ class LikeController < ApplicationController
 
   def delete_like
     response = JSON.parse(request.body.read)[0]
+    return unless post_exist?
+
     post = Post.find(response['post_id'])
     if current_user.likes.where(post_id: post.id).count >= 1
       current_user.likes.where(post_id: post.id).destroy_all
       render json: { action: 'success' }
     else
       render json: { error: 'not liked' }
+    end
+  end
+
+  private
+
+  def post_exist?
+    if Post.exists?(response['post_id'])
+      true
+    else
+      render json: { error: 'post does not exist' }
+      false
     end
   end
 end
