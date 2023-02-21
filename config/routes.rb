@@ -25,4 +25,10 @@ Rails.application.routes.draw do
   get 'api/posts/daily', to: 'post#daily_posts'
   get 'api/posts/me', to: 'post#my_posts'
   delete 'api/posts', to: 'post#delete_post'
+
+  # Routes for Like resource:
+  post 'api/likes', to: 'like#create_like'
+  delete 'api/likes', to: 'like#delete_like'
+  get 'api/likes/me', to: 'like#my_likes'
+  get 'api/likes/post', to: 'like#post_likes'
 end
