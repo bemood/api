@@ -15,6 +15,6 @@ class AuthenticationController < ApplicationController
   def create_user
     result = JSON.parse(request.body.read)[0]
     new_user = User.new(result)
-    new_user.save ? render(json: new_user) : render(json: { error: 'User not created' })
+    new_user.save ? render(json: new_user.render) : render(json: { error: 'User not created' })
   end
 end

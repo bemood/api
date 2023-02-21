@@ -7,7 +7,7 @@ class UserController < ApplicationController
   end
 
   def me
-    render json: current_user
+    render json: current_user.render
   end
 
   def delete

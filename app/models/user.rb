@@ -15,4 +15,13 @@ class User < ApplicationRecord
 
   has_many :posts, dependent: :destroy
   has_many :likes, dependent: :destroy
+
+  def render
+    return {
+      id: self.id,
+      name: self.name,
+      email: self.email,
+      created_at: self.created_at
+    }
+  end
 end

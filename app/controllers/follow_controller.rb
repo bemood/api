@@ -1,38 +1,36 @@
 class FollowController < ApplicationController
   def followers
-    render json: current_user.followers.map { |user| { id: user.id, name: user.name } }
+    render json: { count: current_user.followers.count, followers: current_user.followers.map(&:render) }
   end
 
   def followees
-    render json: current_user.followees.map { |user| { id: user.id, name: user.name } }
+    render json: { count: current_user.followees.count, followees: current_user.followees.map(&:render) }
   end
 
   def create_follow
-    response = JSON.parse(request.body.read)[0]
-    return unless followees_exists?(response['followee_id'])
+    return unless followees_exists?(params['user_id'])
 
-    if current_user.id == response['followee_id']
+    if current_user.id == params['user_id']
       render json: { error: 'cannot follow self' }
       return
     end
 
-    followed_user = User.find(response['followee_id'])
+    followed_user = User.find(params['user_id'])
     if current_user.followees.include?(followed_user)
       render json: { error: 'already following' }
       return
     end
     current_user.followees << followed_user
-    render json: { action: 'success' }
+    render json: { action: 'success', followees: followed_user.render}
   end
 
   def delete_follow
-    response = JSON.parse(request.body.read)[0]
-    return unless followees_exists?(response['followee_id'])
+    return unless followees_exists?(params['user_id'])
 
-    followed_user = User.find(response['followee_id'])
+    followed_user = User.find(params['user_id'])
     if current_user.followees.include?(followed_user)
       current_user.followees.delete(followed_user)
-      render json: { action: 'success' }
+      render json: { action: 'success', followees: followed_user.render }
     else
       render json: { error: 'not following' }
     end

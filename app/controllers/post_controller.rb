@@ -12,17 +12,16 @@ class PostController < ApplicationController
     end
     Music.exists? name: response['name'] ? music = Music.where(name: response['name']).first : music = Music.create(name: response['name'])
     post = current_user.posts.create(music_id: music.id, mood_id: response['mood_id'])
-    post ? render(json: { action: 'success' }) : render(json: { action: 'failure' })
+    post ? render(json: { action: 'success', post: post.render }) : render(json: { action: 'failure' })
   end
 
   def delete_post
-    response = JSON.parse(request.body.read)[0]
-    return unless post_exist?(response)
+    return unless post_exist?(params['post_id'])
 
-    post = Post.find(response['post_id'])
+    post = Post.find(params['post_id'])
     if post.user_id == current_user.id
       post.destroy
-      render json: { action: 'success' }
+      render json: { action: 'success', post: post.render }
     else
       render json: { error: 'not your post' }
     end
@@ -30,19 +29,25 @@ class PostController < ApplicationController
 
   def my_posts
     posts = current_user.posts
-    render json: posts.map { |post| { id: post.id, name: post.music.name, created_at: post.created_at } }
+    # render json: posts.map { |post| { id: post.id, name: post.music.name, created_at: post.created_at } }
+    render json: { count: posts.count, posts: posts.map(&:render) }
   end
 
   def daily_posts
     followees = current_user.followees
     posts = Post.where(created_at: Time.now.beginning_of_day..Time.now.end_of_day, user_id: followees)
-    render json: posts
+    render json: posts.map(&:render)
+  end
+
+  def my_daily_posts
+    posts = current_user.posts.where(created_at: Time.now.beginning_of_day..Time.now.end_of_day)
+    render json: posts.map(&:render)
   end
 
   private
 
-  def post_exist?(response)
-    if Post.exists? response['post_id']
+  def post_exist?(post_id)
+    if Post.exists? post_id
       true
     else
       render json: { error: 'post does not exist' }

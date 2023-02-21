@@ -1,48 +1,44 @@
 class LikeController < ApplicationController
   def my_likes
     likes = current_user.likes
-    render json: likes.map { |like| { id: like.id, post_id: like.post_id, created_at: like.created_at } }
+    render json: { count: likes.count, likes: likes.map { |like| like.post.render } }
   end
 
   def post_likes
-    response = JSON.parse(request.body.read)[0]
-    return unless post_exist?(response)
+    return unless post_exist?(params['post_id'])
 
-    post = Post.find(response['post_id'])
-    likes = post.likes
-    render json: likes.map { |like| { id: like.id, user_id: like.user_id, created_at: like.created_at } }
+    post = Post.find(params['post_id'])
+    render json: {count: post.likes.count, likers: post.likes.map { |like| like.user.render } }
   end
 
   def create_like
-    response = JSON.parse(request.body.read)[0]
-    return unless post_exist?(response)
+    return unless post_exist?(params['post_id'])
 
-    post = Post.find(response['post_id'])
+    post = Post.find(params['post_id'])
     if current_user.likes.where(post_id: post.id).count >= 1
-      render json: { error: 'already liked' }
+      render json: { error: 'already liked', post: post.render }
     else
       current_user.likes.create(post_id: post.id)
-      render json: { action: 'success' }
+      render json: { action: 'success', post: post.render }
     end
   end
 
   def delete_like
-    response = JSON.parse(request.body.read)[0]
-    return unless post_exist?(response)
+    return unless post_exist?(params['post_id'])
 
-    post = Post.find(response['post_id'])
+    post = Post.find(params['post_id'])
     if current_user.likes.where(post_id: post.id).count >= 1
       current_user.likes.where(post_id: post.id).destroy_all
-      render json: { action: 'success' }
+      render json: { action: 'success', post: post.render }
     else
-      render json: { error: 'not liked' }
+      render json: { error: 'not liked', post: post.render}
     end
   end
 
   private
 
-  def post_exist?(response)
-    if Post.exists?(response['post_id'])
+  def post_exist?(post_id)
+    if Post.exists?(post_id)
       true
     else
       render json: { error: 'post does not exist' }
