@@ -6,14 +6,14 @@ class PostController < ApplicationController
       render json: { error: 'already posted today' }
       return
     end
-    music = Music.exists? name: response['name'] ? Music.where(name: response['name']).first : Music.create(name: response['name'])
+    Music.exists? name: response['name'] ? music = Music.where(name: response['name']).first : music = Music.create(name: response['name'])
     post = current_user.posts.create(music_id: music.id)
     post ? render(json: { action: 'success' }) : render(json: { action: 'failure' })
   end
 
   def delete_post
     response = JSON.parse(request.body.read)[0]
-    return unless post_exist?
+    return unless post_exist?(response)
 
     post = Post.find(response['post_id'])
     if post.user_id == current_user.id
@@ -37,8 +37,8 @@ class PostController < ApplicationController
 
   private
 
-  def post_exist?
-    if Post.exists?(response['post_id'])
+  def post_exist?(response)
+    if Post.exists? response['post_id']
       true
     else
       render json: { error: 'post does not exist' }

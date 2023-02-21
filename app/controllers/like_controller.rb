@@ -6,7 +6,7 @@ class LikeController < ApplicationController
 
   def post_likes
     response = JSON.parse(request.body.read)[0]
-    return unless post_exist?
+    return unless post_exist?(response)
 
     post = Post.find(response['post_id'])
     likes = post.likes
@@ -15,7 +15,7 @@ class LikeController < ApplicationController
 
   def create_like
     response = JSON.parse(request.body.read)[0]
-    return unless post_exist?
+    return unless post_exist?(response)
 
     post = Post.find(response['post_id'])
     if current_user.likes.where(post_id: post.id).count >= 1
@@ -28,7 +28,7 @@ class LikeController < ApplicationController
 
   def delete_like
     response = JSON.parse(request.body.read)[0]
-    return unless post_exist?
+    return unless post_exist?(response)
 
     post = Post.find(response['post_id'])
     if current_user.likes.where(post_id: post.id).count >= 1
@@ -41,7 +41,7 @@ class LikeController < ApplicationController
 
   private
 
-  def post_exist?
+  def post_exist?(response)
     if Post.exists?(response['post_id'])
       true
     else

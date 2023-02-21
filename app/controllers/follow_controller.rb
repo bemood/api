@@ -1,10 +1,10 @@
 class FollowController < ApplicationController
   def followers
-    render json: current_user.followers
+    render json: current_user.followers.map { |user| { id: user.id, name: user.name } }
   end
 
   def followees
-    render json: current_user.followees
+    render json: current_user.followees.map { |user| { id: user.id, name: user.name } }
   end
 
   def create_follow
