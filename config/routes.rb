@@ -31,4 +31,7 @@ Rails.application.routes.draw do
   delete 'api/likes', to: 'like#delete_like'
   get 'api/likes/me', to: 'like#my_likes'
   get 'api/likes/post', to: 'like#post_likes'
+
+  # Routes for Mood resource:
+  get 'api/moods', to: 'mood#all_moods'
 end

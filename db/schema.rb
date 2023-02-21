@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2023_02_21_162249) do
+ActiveRecord::Schema[7.0].define(version: 2023_02_21_213431) do
   create_table "follows", force: :cascade do |t|
     t.integer "follower_id"
     t.integer "followee_id"
@@ -27,6 +27,13 @@ ActiveRecord::Schema[7.0].define(version: 2023_02_21_162249) do
     t.index ["user_id"], name: "index_likes_on_user_id"
   end
 
+  create_table "moods", force: :cascade do |t|
+    t.string "emojie"
+    t.string "definition"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
   create_table "musics", force: :cascade do |t|
     t.string "name"
     t.datetime "created_at", null: false
@@ -38,6 +45,8 @@ ActiveRecord::Schema[7.0].define(version: 2023_02_21_162249) do
     t.integer "music_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "mood_id", null: false
+    t.index ["mood_id"], name: "index_posts_on_mood_id"
     t.index ["music_id"], name: "index_posts_on_music_id"
     t.index ["user_id"], name: "index_posts_on_user_id"
   end
@@ -53,6 +62,7 @@ ActiveRecord::Schema[7.0].define(version: 2023_02_21_162249) do
 
   add_foreign_key "likes", "posts"
   add_foreign_key "likes", "users"
+  add_foreign_key "posts", "moods"
   add_foreign_key "posts", "musics"
   add_foreign_key "posts", "users"
 end
