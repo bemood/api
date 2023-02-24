@@ -29,6 +29,10 @@ Rails.application.routes.draw do
   delete 'api/posts/:post_id', to: 'post#delete_post'
   get 'api/me/posts/daily', to: 'post#my_daily_posts'
 
+  # Routes for Music resource:
+  get 'api/musics/search', to: 'music#search'
+  get 'api/musics/:music_id', to: 'music#music'
+
   # Routes for Like resource:
   post 'api/likes/:post_id', to: 'like#create_like'
   delete 'api/likes/:post_id', to: 'like#delete_like'
