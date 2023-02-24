@@ -2,7 +2,7 @@ class AuthenticationController < ApplicationController
   skip_before_action :authenticate_request
 
   def authenticate
-    result = JSON.parse(request.body.read)[0]
+    result = JSON.parse(request.body.read)
     command = AuthenticateUser.call(result['email'], result['password'])
 
     if command.success?
@@ -13,7 +13,7 @@ class AuthenticationController < ApplicationController
   end
 
   def create_user
-    result = JSON.parse(request.body.read)[0]
+    result = JSON.parse(request.body.read)
     new_user = User.new(result)
     new_user.save ? render(json: new_user.render) : render(json: { error: 'User not created' })
   end
