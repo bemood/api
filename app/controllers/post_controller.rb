@@ -10,7 +10,7 @@ class PostController < ApplicationController
       render json: { error: 'mood does not exist' }
       return
     end
-    Music.exists? name: response['name'] ? music = Music.where(name: response['name']).first : music = Music.create(name: response['name'])
+    Music.exists? spotify_id: response['spotify_id'] ? music = Music.where(spotify_id: response['spotify_id']).first : music = Music.create(spotify_id: response['spotify_id'])
     post = current_user.posts.create(music_id: music.id, mood_id: response['mood_id'])
     post ? render(json: { action: 'success', post: post.render }) : render(json: { action: 'failure' })
   end
