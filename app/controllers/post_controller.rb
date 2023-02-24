@@ -1,7 +1,7 @@
 class PostController < ApplicationController
 
   def new_post
-    response = JSON.parse(request.body.read)[0]
+    response = JSON.parse(request.body.read)
     if current_user.posts.where(created_at: Time.now.beginning_of_day..Time.now.end_of_day).count >= 1
       render json: { error: 'already posted today' }
       return
@@ -10,7 +10,13 @@ class PostController < ApplicationController
       render json: { error: 'mood does not exist' }
       return
     end
-    Music.exists? spotify_id: response['spotify_id'] ? music = Music.where(spotify_id: response['spotify_id']).first : music = Music.create(spotify_id: response['spotify_id'])
+    if Music.exists? spotify_id: response['spotify_id']
+      music = Music.where(spotify_id: response['spotify_id']).first
+    else
+      music = Music.create(spotify_id: response['spotify_id'])
+    end
+    puts music
+    puts "music id: #{response['spotify_id']}"
     post = current_user.posts.create(music_id: music.id, mood_id: response['mood_id'])
     post ? render(json: { action: 'success', post: post.render }) : render(json: { action: 'failure' })
   end
