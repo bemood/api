@@ -17,4 +17,9 @@ class AuthenticationController < ApplicationController
     new_user = User.new(result)
     new_user.save ? render(json: new_user.render) : render(json: { error: 'User not created' })
   end
+
+  def image_user
+    @user = User.find(params[:id])
+    send_data Base64.decode64(@user.image), type: 'image/png', disposition: 'inline'
+  end
 end

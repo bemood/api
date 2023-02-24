@@ -10,6 +10,12 @@ class UserController < ApplicationController
     render json: current_user.render
   end
 
+  def update
+    user_params = JSON.parse(request.body.read)
+    current_user.update(user_params)
+    render json: current_user.render
+  end
+
   def delete
     current_user.destroy
     render json: { action: 'success' }

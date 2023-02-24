@@ -1,4 +1,5 @@
 require 'bcrypt'
+require 'base64'
 
 class User < ApplicationRecord
   has_secure_password
@@ -21,6 +22,7 @@ class User < ApplicationRecord
       id: self.id,
       name: self.name,
       email: self.email,
+      image: "/image/#{self.id}",
       created_at: self.created_at
     }
   end

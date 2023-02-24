@@ -11,6 +11,8 @@ Rails.application.routes.draw do
   get 'api/users', to: 'user#users'
   get 'api/me/users', to: 'user#me'
   delete 'api/me/users', to: 'user#delete'
+  put 'api/me/users', to: 'user#update'
+  get 'image/:id', to: 'authentication#image_user'
 
   # Routes for Friend resource:
   # followers = Who follow me
