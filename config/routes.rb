@@ -7,26 +7,25 @@ Rails.application.routes.draw do
   post 'api/authenticate', to: 'authentication#authenticate'
 
   # Routes for the User resource:
-  get 'api/users', to: 'user#users'
   post 'api/users', to: 'authentication#create_user'
-  get 'api/users/me', to: 'user#me'
-  delete 'api/users/me', to: 'user#delete'
+  get 'api/users', to: 'user#users'
+  get 'api/me/users', to: 'user#me'
+  delete 'api/me/users', to: 'user#delete'
 
   # Routes for Friend resource:
   # followers = Who follow me
   get 'api/me/followers', to: 'follow#followers'
   post 'api/follows/:user_id', to: 'follow#create_follow'
   delete 'api/follows/:user_id', to: 'follow#delete_follow'
-
   # followees = Who I follow
   get 'api/me/followees', to: 'follow#followees'
 
   # Routes for Post resource:
   post 'api/posts', to: 'post#new_post'
   get 'api/posts/daily', to: 'post#daily_posts'
-  get 'api/me/posts/daily', to: 'post#my_daily_posts'
   get 'api/me/posts', to: 'post#my_posts'
   delete 'api/posts/:post_id', to: 'post#delete_post'
+  get 'api/me/posts/daily', to: 'post#my_daily_posts'
 
   # Routes for Like resource:
   post 'api/likes/:post_id', to: 'like#create_like'
