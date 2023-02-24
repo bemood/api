@@ -22,6 +22,9 @@ class User < ApplicationRecord
       id: self.id,
       name: self.name,
       email: self.email,
+      followers_count: self.followers.count,
+      followees_count: self.followees.count,
+      all_likes_count: self.posts.sum { |post| post.likes.count },
       image: "/image/#{self.id}",
       created_at: self.created_at
     }
