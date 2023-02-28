@@ -1,22 +1,9 @@
 class PostController < ApplicationController
-
   def new_post
     response = JSON.parse(request.body.read)
-    if current_user.posts.where(created_at: Time.now.beginning_of_day..Time.now.end_of_day).count >= 1
-      render json: { error: 'already posted today' }
-      return
-    end
-    unless Mood.exists? id: response['mood_id']
-      render json: { error: 'mood does not exist' }
-      return
-    end
-    if Music.exists? spotify_id: response['spotify_id']
-      music = Music.where(spotify_id: response['spotify_id']).first
-    else
-      music = Music.create(spotify_id: response['spotify_id'])
-    end
-    puts music
-    puts "music id: #{response['spotify_id']}"
+    return new_post_unrespect_condition(response) if new_post_unrespect_condition(response)
+
+    music = get_music(response['music_id'])
     post = current_user.posts.create(music_id: music.id, mood_id: response['mood_id'])
     post ? render(json: { action: 'success', post: post.render }) : render(json: { action: 'failure' })
   end
@@ -35,7 +22,6 @@ class PostController < ApplicationController
 
   def my_posts
     posts = current_user.posts
-    # render json: posts.map { |post| { id: post.id, name: post.music.name, created_at: post.created_at } }
     render json: { count: posts.count, posts: posts.map(&:render) }
   end
 
@@ -58,6 +44,23 @@ class PostController < ApplicationController
     else
       render json: { error: 'post does not exist' }
       false
+    end
+  end
+
+  def new_post_unrespect_condition(response)
+    if current_user.posts.where(created_at: Time.now.beginning_of_day..Time.now.end_of_day).count >= 1
+      return render json: { error: 'already posted today' }
+    end
+    return render json: { error: 'mood does not exist' } unless Mood.exists? id: response['mood_id']
+
+    false
+  end
+
+  def get_music(id_spotify)
+    if Music.exists? spotify_id: id_spotify
+      Music.where(spotify_id: id_spotify).first
+    else
+      Music.create(spotify_id: id_spotify)
     end
   end
 end

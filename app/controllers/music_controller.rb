@@ -2,7 +2,7 @@ class MusicController < ApplicationController
 
   def search
     params = JSON.parse(request.body.read)
-    tracks = RSpotify::Track.search("track: #{params["track"].to_s}")
+    tracks = RSpotify::Track.search("track: #{params['track']}")
     result = tracks.map do |track|
       {
         id: track.id,
@@ -16,7 +16,7 @@ class MusicController < ApplicationController
   end
 
   def music
-    track = RSpotify::Track.find(params["music_id"].to_s)
+    track = RSpotify::Track.find(params['music_id'].to_s)
     render json: {
       id: track.id,
       name: track.name,
