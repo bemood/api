@@ -37,7 +37,7 @@ class PostController < ApplicationController
   def daily_posts
     followees = current_user.followees
     posts = Post.where(created_at: Time.now.beginning_of_day..Time.now.end_of_day, user_id: followees)
-    render json: posts.map(&:render)
+    render json: posts.map { |post| post.render(current_user) }
   end
 
   def my_daily_posts
