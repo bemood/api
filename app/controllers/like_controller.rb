@@ -1,7 +1,7 @@
 class LikeController < ApplicationController
   def my_likes
     likes = current_user.likes
-    render json: { count: likes.count, likes: likes.map { |like| like.post.render } }
+    render json: { count: likes.count, likes: likes.map { |like| like.post.render(current_user) } }
   end
 
   def post_likes
@@ -16,10 +16,10 @@ class LikeController < ApplicationController
 
     post = Post.find(params['post_id'])
     if current_user.likes.where(post_id: post.id).count >= 1
-      render json: { error: 'already liked', post: post.render }
+      render json: { error: 'already liked', post: post.render(current_user) }
     else
       current_user.likes.create(post_id: post.id)
-      render json: { action: 'success', post: post.render }
+      render json: { action: 'success', post: post.render(current_user) }
     end
   end
 
@@ -29,9 +29,9 @@ class LikeController < ApplicationController
     post = Post.find(params['post_id'])
     if current_user.likes.where(post_id: post.id).count >= 1
       current_user.likes.where(post_id: post.id).destroy_all
-      render json: { action: 'success', post: post.render }
+      render json: { action: 'success', post: post.render(current_user) }
     else
-      render json: { error: 'not liked', post: post.render}
+      render json: { error: 'not liked', post: post.render(current_user)}
     end
   end
 
