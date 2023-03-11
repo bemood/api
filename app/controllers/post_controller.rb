@@ -41,8 +41,8 @@ class PostController < ApplicationController
   end
 
   def my_daily_posts
-    posts = current_user.posts.where(created_at: Time.now.beginning_of_day..Time.now.end_of_day)
-    render json: posts.map(&:render)
+    post = current_user.posts.where(created_at: Time.now.beginning_of_day..Time.now.end_of_day).first
+    render json: post.render
   end
 
   private
