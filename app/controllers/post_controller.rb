@@ -1,12 +1,11 @@
 class PostController < ApplicationController
+  # Voir avec JBuilder
   def new_post
     response = JSON.parse(request.body.read)
-    return render json: { error: 'mood does not exist' } unless Mood.exists? id: response['mood_id']
     if current_user.posts.where(created_at: Time.now.beginning_of_day..Time.now.end_of_day).count >= 1
       return render json: { error: 'already posted today' }
     end
-
-
+    return render json: { error: 'mood does not exist' } unless Mood.exists? id: response['mood_id']
 
     if Music.exists? spotify_id: response['spotify_id']
       music = Music.where(spotify_id: response['spotify_id']).first
@@ -15,7 +14,7 @@ class PostController < ApplicationController
     end
 
     post = current_user.posts.create(music_id: music.id, mood_id: response['mood_id'])
-    post ? render(json: { action: 'success', post: post.render }) : render(json: { action: 'failure' })
+    post ? render(json: { action: 'success', post: post.render }) : render(json: { error: 'failure' })
   end
 
   def delete_post
@@ -55,9 +54,5 @@ class PostController < ApplicationController
       render json: { error: 'post does not exist' }
       false
     end
-  end
-
-  def get_music(id_spotify)
-
   end
 end
