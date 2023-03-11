@@ -14,7 +14,7 @@ class PostController < ApplicationController
     end
 
     post = current_user.posts.create(music_id: music.id, mood_id: response['mood_id'])
-    post ? render(json: { action: 'success', post: post.render }) : render(json: { error: 'failure' })
+    post ? render(json: { action: 'success', post: post.render(current_user) }) : render(json: { error: 'failure' })
   end
 
   def delete_post
@@ -23,7 +23,7 @@ class PostController < ApplicationController
     post = Post.find(params['post_id'])
     if post.user_id == current_user.id
       post.destroy
-      render json: { action: 'success', post: post.render }
+      render json: { action: 'success', post: post.render(current_user) }
     else
       render json: { error: 'not your post' }
     end
@@ -31,7 +31,7 @@ class PostController < ApplicationController
 
   def my_posts
     posts = current_user.posts
-    render json: { count: posts.count, posts: posts.map(&:render) }
+    render json: { count: posts.count, posts: posts.map { |post| post.render(current_user) } }
   end
 
   def daily_posts
@@ -42,7 +42,7 @@ class PostController < ApplicationController
 
   def my_daily_posts
     post = current_user.posts.where(created_at: Time.now.beginning_of_day..Time.now.end_of_day).first
-    render json: post.render
+    render json: post.render(current_user)
   end
 
   private
