@@ -1,8 +1,8 @@
 class LikeController < ApplicationController
   def my_likes
-    @likes = current_user.likes
+    @posts = current_user.likes.map(&:post)
     @current_user = current_user
-    render 'likes/index'
+    render 'posts/index'
   end
 
   def post_likes
