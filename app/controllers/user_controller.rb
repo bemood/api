@@ -1,23 +1,33 @@
 require 'json'
 
 class UserController < ApplicationController
-  def users
-    # get all user name
-    render json: User.all.map { |user| { name: user.name, email: user.email } }
+  def index
+    @users = User.all
+    render 'users/index'
   end
 
   def me
-    render json: current_user.render
+    @user = User.find(current_user.id)
+    render 'users/me'
   end
 
   def update
-    user_params = JSON.parse(request.body.read)
     current_user.update(user_params)
-    render json: current_user.render
+    @user = current_user
+    render 'users/me'
   end
 
   def delete
-    current_user.destroy
-    render json: { action: 'success' }
+    if current_user.destroy
+      render 'informations/success'
+    else
+      render 'informations/error'
+    end
+  end
+
+  private
+
+  def user_params
+    params.permit(:name, :email, :password, :password_confirmation, :image)
   end
 end

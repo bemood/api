@@ -8,7 +8,7 @@ Rails.application.routes.draw do
 
   # Routes for the User resource:
   post 'api/users', to: 'authentication#create_user'
-  get 'api/users', to: 'user#users'
+  get 'api/users', to: 'user#index'
   get 'api/me/users', to: 'user#me'
   delete 'api/me/users', to: 'user#delete'
   put 'api/me/users', to: 'user#update'

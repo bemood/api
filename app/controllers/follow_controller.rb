@@ -1,49 +1,44 @@
 class FollowController < ApplicationController
   def followers
-    render json: { count: current_user.followers.count, followers: current_user.followers.map(&:render) }
+    @followers = current_user.followers
+    render 'follows/followers'
   end
 
   def followees
-    render json: { count: current_user.followees.count, followees: current_user.followees.map(&:render) }
+    @followees = current_user.followees
+    render 'follows/followees'
   end
 
   def create_follow
-    return unless followees_exists?(params['user_id'])
+    @error = followees_condition[:message]
+    return render 'informations/error' if @error
 
-    if current_user.id == params['user_id']
-      render json: { error: 'cannot follow self' }
-      return
-    end
-
-    followed_user = User.find(params['user_id'])
-    if current_user.followees.include?(followed_user)
-      render json: { error: 'already following' }
-      return
-    end
-    current_user.followees << followed_user
-    render json: { action: 'success', followees: followed_user.render}
+    current_user.followees << User.find(params['user_id'])
+    @success = 'Followed'
+    render 'informations/success'
   end
 
   def delete_follow
-    return unless followees_exists?(params['user_id'])
+    @error = 'Followees does not exist' unless User.exists?(params['user_id'])
+    return render 'informations/error' if @error
 
-    followed_user = User.find(params['user_id'])
-    if current_user.followees.include?(followed_user)
-      current_user.followees.delete(followed_user)
-      render json: { action: 'success', followees: followed_user.render }
-    else
-      render json: { error: 'not following' }
-    end
+    @error = 'Not following' unless current_user.followees.include?(User.find(params['user_id']))
+    return render 'informations/error' if @error
+
+    current_user.followees.delete(User.find(params['user_id']))
+    @success = 'Unfollowed'
+    render 'informations/success'
   end
 
   private
 
-  def followees_exists?(followee_id)
-    if User.exists?(followee_id)
-      true
-    else
-      render json: { error: 'user does not exist' }
-      false
-    end
+  def followees_condition
+    return { error: true, message: 'Followees does not exist' } unless User.exists?(params['user_id'])
+
+    return { error: true, message: 'Cannot follow self' } if current_user.id == params['user_id'].to_i
+
+    return { error: true, message: 'Already following' } if current_user.followees.include?(User.find(params['user_id']))
+
+    { error: false, message: nil }
   end
 end

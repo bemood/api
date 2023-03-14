@@ -1,48 +1,47 @@
 class LikeController < ApplicationController
   def my_likes
-    likes = current_user.likes
-    render json: { count: likes.count, likes: likes.map { |like| like.post.render(current_user) } }
+    @likes = current_user.likes
+    @current_user = current_user
+    render 'likes/index'
   end
 
   def post_likes
-    return unless post_exist?(params['post_id'])
+    @error = 'Post does not exist'
+    return render 'informations/error' unless Post.exists?(params['post_id'])
 
-    post = Post.find(params['post_id'])
-    render json: {count: post.likes.count, likers: post.likes.map { |like| like.user.render } }
+    @likes = Like.where(post_id: params['post_id'])
+    @current_user = current_user
+    render 'likes/index'
+
   end
 
   def create_like
-    return unless post_exist?(params['post_id'])
+    @error = 'Post does not exist'
+    return render 'informations/error' unless Post.exists?(params['post_id'])
 
     post = Post.find(params['post_id'])
     if current_user.likes.where(post_id: post.id).count >= 1
-      render json: { error: 'already liked', post: post.render(current_user) }
+      @error = 'Already liked'
+      render 'informations/error'
     else
       current_user.likes.create(post_id: post.id)
-      render json: { action: 'success', post: post.render(current_user) }
+      @success = 'Liked'
+      render 'informations/success'
     end
   end
 
   def delete_like
-    return unless post_exist?(params['post_id'])
+    @error = 'Post does not exist'
+    return render 'informations/error' unless Post.exists?(params['post_id'])
 
     post = Post.find(params['post_id'])
     if current_user.likes.where(post_id: post.id).count >= 1
       current_user.likes.where(post_id: post.id).destroy_all
-      render json: { action: 'success', post: post.render(current_user) }
+      @success = 'Unliked'
+      render 'informations/success'
     else
-      render json: { error: 'not liked', post: post.render(current_user)}
-    end
-  end
-
-  private
-
-  def post_exist?(post_id)
-    if Post.exists?(post_id)
-      true
-    else
-      render json: { error: 'post does not exist' }
-      false
+      @error = 'Not liked'
+      render 'informations/error'
     end
   end
 end

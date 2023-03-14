@@ -17,4 +17,8 @@ class Music < ApplicationRecord
       }
     }
   end
+
+  def get_spotify_song
+    RSpotify::Track.find(self.spotify_id)
+  end
 end

@@ -3,9 +3,13 @@ class PostController < ApplicationController
   def new_post
     response = JSON.parse(request.body.read)
     if current_user.posts.where(created_at: Time.now.beginning_of_day..Time.now.end_of_day).count >= 1
-      return render json: { error: 'already posted today' }
+      @error = 'already posted today'
+      return render 'informations/error'
     end
-    return render json: { error: 'mood does not exist' } unless Mood.exists? id: response['mood_id']
+    unless Mood.exists? id: response['mood_id']
+      @error = 'mood does not exist'
+      return render 'informations/error'
+    end
 
     if Music.exists? spotify_id: response['spotify_id']
       music = Music.where(spotify_id: response['spotify_id']).first
@@ -13,36 +17,48 @@ class PostController < ApplicationController
       music = Music.create(spotify_id: response['spotify_id'])
     end
 
-    post = current_user.posts.create(music_id: music.id, mood_id: response['mood_id'])
-    post ? render(json: { action: 'success', post: post.render(current_user) }) : render(json: { error: 'failure' })
+    @post = current_user.posts.create(music_id: music.id, mood_id: response['mood_id'])
+    if @post
+      @user = current_user
+      render 'posts/new_post'
+    else
+      @error = 'failure'
+      render 'informations/error'
+    end
   end
 
   def delete_post
-    return unless post_exist?(params['post_id'])
+    @error = 'Post does not exist'
+    return render 'informations/error' unless post_exist?(params['post_id'])
 
     post = Post.find(params['post_id'])
     if post.user_id == current_user.id
       post.destroy
-      render json: { action: 'success', post: post.render(current_user) }
+      @success = 'Post deleted'
+      render 'informations/success'
     else
-      render json: { error: 'not your post' }
+      @error = 'You are not the owner of this post'
+      render 'informations/error'
     end
   end
 
   def my_posts
-    posts = current_user.posts
-    render json: { count: posts.count, posts: posts.map { |post| post.render(current_user) } }
+    @posts = current_user.posts
+    @current_user = current_user
+    render 'posts/index'
   end
 
   def daily_posts
     followees = current_user.followees
-    posts = Post.where(created_at: Time.now.beginning_of_day..Time.now.end_of_day, user_id: followees)
-    render json: posts.map { |post| post.render(current_user) }
+    @posts = Post.where(created_at: Time.now.beginning_of_day..Time.now.end_of_day, user_id: followees)
+    @current_user = current_user
+    render 'posts/index'
   end
 
   def my_daily_posts
-    post = current_user.posts.where(created_at: Time.now.beginning_of_day..Time.now.end_of_day).first
-    render json: post.render(current_user)
+    @post = current_user.posts.where(created_at: Time.now.beginning_of_day..Time.now.end_of_day).first
+    @current_user = current_user
+    render 'posts/show'
   end
 
   private

@@ -97,6 +97,9 @@ GEM
     io-console (0.6.0)
     irb (1.6.2)
       reline (>= 0.3.0)
+    jbuilder (2.11.5)
+      actionview (>= 5.0.0)
+      activesupport (>= 5.0.0)
     json (2.6.3)
     jwt (2.7.0)
     loofah (2.19.1)
@@ -216,6 +219,7 @@ DEPENDENCIES
   bootsnap
   debug
   faker
+  jbuilder
   json
   jwt
   puma (~> 5.0)
