@@ -132,6 +132,8 @@ GEM
     nio4r (2.5.8)
     nokogiri (1.14.2-arm64-darwin)
       racc (~> 1.4)
+    nokogiri (1.14.2-x86_64-darwin)
+      racc (~> 1.4)
     oauth2 (2.0.9)
       faraday (>= 0.17.3, < 3.0)
       jwt (>= 1.0, < 3.0)
@@ -182,6 +184,7 @@ GEM
       thor (~> 1.0)
       zeitwerk (~> 2.5)
     rake (13.0.6)
+    redis (4.2.5)
     reline (0.3.2)
       io-console (~> 0.5)
     rest-client (2.0.2)
@@ -198,6 +201,7 @@ GEM
       hashie
       version_gem (~> 1.1, >= 1.1.1)
     sqlite3 (1.6.0-arm64-darwin)
+    sqlite3 (1.6.0-x86_64-darwin)
     thor (1.2.1)
     timeout (0.3.1)
     tzinfo (2.0.6)
@@ -213,6 +217,7 @@ GEM
 
 PLATFORMS
   arm64-darwin-22
+  x86_64-darwin-21
 
 DEPENDENCIES
   bcrypt (~> 3.1.7)
@@ -224,6 +229,7 @@ DEPENDENCIES
   jwt
   puma (~> 5.0)
   rails (~> 7.0.4, >= 7.0.4.2)
+  redis (~> 4.0)
   rspotify
   simple_command
   sqlite3 (~> 1.4)
