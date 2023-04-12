@@ -58,7 +58,12 @@ class PostController < ApplicationController
   def my_daily_posts
     @post = current_user.posts.where(created_at: Time.now.beginning_of_day..Time.now.end_of_day).first
     @current_user = current_user
-    render 'posts/show'
+
+    if @post.nil?
+      render json: { error: 'post does not exist' } unless @post
+    else
+      render 'posts/show'
+    end
   end
 
   private
